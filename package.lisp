@@ -110,6 +110,7 @@
 
 (defpackage #:org.shirakumo.fraf.theora
   (:use #:cl)
+  (:shadow #:open)
   (:local-nicknames
    (#:theora #:org.shirakumo.fraf.theora.cffi)
    (#:mem #:org.shirakumo.memory-regions))
@@ -128,6 +129,7 @@
    #:audio-track
    #:video-track
    #:free
+   #:open
    #:reset
    #:done-p
    #:read-video

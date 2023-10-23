@@ -1,2 +1,17 @@
 # About cl-theora
 This is a decoder library for the OGG/Theora video format via the theorafile C library. It offers easy and fast decoding for Theora video files, primarily intended for video playback in games.
+
+## How To
+Load the library and create a new file:
+
+:: common lisp
+(org.shirakumo.fraf.theora:open "video.ogg")
+::
+
+From there you can read out the properties like the ``width``, ``height``, ``framerate``, ``pixel-format``, ``channels``, ``samplerate``, ``audio-track``, and ``video-track``.
+
+With ``read-video`` and ``read-audio`` you can read out video and audio data respectively. Note that synchronising playback both streams is left up to you. Video is decoded as 8-bit YUV, and audio is decoded as floats.
+
+Note that reading video and audio is not thread safe, so you must put a lock around both if you intend on decoding from multiple threads.
+
+Once you are done with the file, you must ``free`` it.

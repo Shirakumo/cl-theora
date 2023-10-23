@@ -134,6 +134,9 @@
        ,@cleanup
        (error 'theora-error :file ,file :code code))))
 
+(defun open (source)
+  (make-instance 'file :source source))
+
 (defmethod %open ((source pathname) handle)
   (check-open source (theora:open (uiop:native-namestring source) handle)))
 
