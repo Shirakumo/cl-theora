@@ -24,3 +24,20 @@ ffmpeg -i my-file -codec:v libtheora -qscale:v 7 -codec:a libvorbis -qscale:a 5 
 ::
 
 ``qscale:v`` and ``qscale:a`` are the respective video and audio quality optimisation options, ranging from 0 to 10.
+
+## Decoding YUV Data
+For reference, here's a very basic YUV decoding fragment shader:
+
+:: glsl
+in vec2 tex_coord;
+uniform sampler2D Y, U, V;
+void main() {
+	vec3 yuv = vec3(texture(Y, tex_coord).r - 0.0625,
+                    texture(U, tex_coord).r - 0.5,
+                    texture(V, tex_coord).r - 0.5);
+	vec3 rgb = vec3(dot(yuv, vec3(+1.164, +0.000, +1.793)),
+                    dot(yuv, vec3(+1.164, -0.213, -0.533)),
+                    dot(yuv, vec3(+1.164, +2.112, +0.000)));
+	gl_FragColor = vec4(rgb, 1.0);
+}
+::
