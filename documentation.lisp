@@ -61,7 +61,7 @@ See OPEN
 See RESET
 See DONE-P
 See READ-VIDEO
-SEe READ-AUDIO")
+See READ-AUDIO")
   
   (function width
     "Returns the width of the video in pixels.
