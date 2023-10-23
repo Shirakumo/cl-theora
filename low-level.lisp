@@ -149,7 +149,7 @@
   (file :pointer)
   (width :pointer)
   (height :pointer)
-  (fps :double)
+  (fps :pointer)
   (pixel-format :pointer))
 
 (cffi:defcfun ("tf_audioinfo" audio-info) :void
