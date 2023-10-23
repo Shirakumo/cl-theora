@@ -1,68 +1,12 @@
-# Makefile for Theorafile
-# Written by Ethan "flibitijibibo" Lee
+ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+OS = misc
+ARCH = misc
+EXT = so
+LDFLAGS += -lm
+CFLAGS += -O3 -g -fpic -fPIC
+INCLUDES = -I$(ROOT_DIR) -I$(ROOT_DIR)/lib -I$(ROOT_DIR)/lib/ogg -I$(ROOT_DIR)/lib/vorbis -I$(ROOT_DIR)/lib/theora
 
-# Detect cross targets
-TRIPLET=$(shell $(CC) -dumpmachine)
-WINDOWS_TARGET=0
-APPLE_TARGET=0
-ifeq ($(OS), Windows_NT) # cygwin/msys2
-	WINDOWS_TARGET=1
-endif
-ifneq (,$(findstring w64-mingw32,$(TRIPLET)))
-	WINDOWS_TARGET=1
-endif
-ifneq (,$(findstring w64-windows,$(TRIPLET)))
-	WINDOWS_TARGET=1
-endif
-ifneq (,$(findstring apple-darwin,$(TRIPLET)))
-	APPLE_TARGET=1
-endif
-ifneq (,$(findstring x86_64,$(TRIPLET)))
-	DEFINES += -DOC_X86_ASM -DOC_X86_64_ASM
-	TFSRC_ARCH_OPT = $(TFSRC_ARCH_X86)
-endif
-ifneq (,$(findstring i686,$(TRIPLET)))
-	DEFINES += -DOC_X86_ASM
-	TFSRC_ARCH_OPT = $(TFSRC_ARCH_X86)
-endif
-# this requires the compiler to support the ARM Neon, Media, and EDSP extensions
-ifneq (,$(findstring armv7,$(TRIPLET)))
-	DEFINES += -DOC_ARM_ASM -DOC_ARM_ASM_EDSP -DOC_ARM_ASM_MEDIA -DOC_ARM_ASM_NEON
-	TFSRC_ARCH_OPT = $(TFSRC_ARCH_ARM)
-endif
-ifneq (,$(findstring aarch64,$(TRIPLET)))
-	DEFINES += -DOC_ARM_ASM -DOC_ARM_ASM_EDSP -DOC_ARM_ASM_MEDIA -DOC_ARM_ASM_NEON
-	TFSRC_ARCH_OPT = $(TFSRC_ARCH_ARM)
-endif
-
-# Compiler
-ifeq ($(WINDOWS_TARGET),1)
-	TARGET = dll
-	LDFLAGS += -static-libgcc
-else ifeq ($(APPLE_TARGET),1)
-	CC += -mmacosx-version-min=10.9
-	TARGET = dylib
-	CFLAGS += -fpic -fPIC
-	LDFLAGS += -install_name @rpath/libtheorafile.dylib
-else
-	TARGET = so
-	CFLAGS += -fpic -fPIC
-endif
-
-LIB = libtheorafile.$(TARGET)
-
-CFLAGS += -O3
-
-SRCDIR = $(dir $(MAKEFILE_LIST))
-
-vpath %.c $(SRCDIR)
-
-# Includes
-INCLUDES = -I$(SRCDIR) -I$(SRCDIR)/lib -I$(SRCDIR)/lib/ogg -I$(SRCDIR)/lib/vorbis -I$(SRCDIR)/lib/theora
-
-# Source
-TFSRC = $(TFSRC_ARCH_GENERIC) $(TFSRC_ARCH_OPT)
-TFSRC_ARCH_GENERIC = \
+SRC = \
 	theorafile.c \
 	lib/ogg/bitwise.c \
 	lib/ogg/framing.c \
@@ -99,35 +43,58 @@ TFSRC_ARCH_GENERIC = \
 	lib/theora/internal.c \
 	lib/theora/quant.c \
 	lib/theora/state.c
-TFSRC_ARCH_X86 = \
+SRC_X86 = \
 	lib/theora/x86/mmxfrag.c \
 	lib/theora/x86/mmxidct.c \
 	lib/theora/x86/mmxstate.c \
 	lib/theora/x86/sse2idct.c \
 	lib/theora/x86/x86cpu.c \
 	lib/theora/x86/x86state.c
-TFSRC_ARCH_ARM = \
+SRC_ARM = \
 	lib/theora/arm-intrinsics/armcpu.c \
 	lib/theora/arm-intrinsics/armfrag.c \
 	lib/theora/arm-intrinsics/armidct.c \
 	lib/theora/arm-intrinsics/armloop.c \
 	lib/theora/arm-intrinsics/armstate.c
 
-# Targets
-.PHONY: lib all clean test
-lib: $(LIB)
-all: $(LIB) theorafile-test
-clean:
-	rm -f $(LIB) theorafile-test
-test: theorafile-test
-$(LIB): $(TFSRC)
-	$(CC) $(CFLAGS) -shared -o $@ $^ $(INCLUDES) $(DEFINES) -lm $(LDFLAGS)
-theorafile-test: $(TFSRC)
-	$(CC) $(CFLAGS) -g -o $@ sdl2test/sdl2test.c $(TFSRC) $(INCLUDES) $(DEFINES) `sdl2-config --cflags --libs` -lm
-lib/theora/arm/armfrag.o: lib/theora/arm/armopts-gnu.S
-.INTERMEDIATE: lib/theora/arm/armopts-gnu.S
-.SUFFIXES:
-%-gnu.S: %.s
-	lib/theora/arm/arm2gnu.pl < $< > $@
-%.o: %-gnu.S
-	$(CC) -c -o $@ -Ilib/theora/arm $<
+UNAME_M := $(shell uname -m)
+ifeq ($(UNAME_M),x86_64)
+	CFLAGS += -DOC_X86_ASM -DOC_X86_64_ASM
+	SRC += $(SRC_X86)
+	ARCH = amd64
+endif
+ifneq ($(filter %86,$(UNAME_M)),)
+	CFLAGS += -DOC_X86_ASM
+	SRC += $(SRC_X86)
+	ARCH = i686
+endif
+ifneq ($(filter arm%,$(UNAME_M)),)
+	CFLAGS += -DOC_ARM_ASM -DOC_ARM_ASM_EDSP -DOC_ARM_ASM_MEDIA -DOC_ARM_ASM_NEON
+	SRC += $(SRC_ARM)
+	ARCH = arm64
+endif
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	CFLAGS += -static-libgcc
+	OS = lin
+	ifeq ($(ARCH), i686)
+		CFLAGS += -include "$(ROOT_DIR)/glibcver/glibc_2.9_x86.h"
+	else ifeq ($(ARCH), amd64)
+		CFLAGS += -include "$(ROOT_DIR)/glibcver/glibc_2.9_x64.h"
+	endif
+endif
+ifeq ($(UNAME_S),Darwin)
+	CFLAGS += -mmacosx-version-min=10.9
+	OS = mac
+	EXT = dylib
+endif
+ifneq ($(filter MINGW%,$(UNAME_S)),)
+	OS = win
+	EXT = dll
+endif
+
+all:
+	mkdir -p ../static
+	$(CC) $(CFLAGS) -shared -o "$(ROOT_DIR)/../static/libtheorafile-$(OS)-$(ARCH).$(EXT)" $(SRC) $(INCLUDES) $(LDFLAGS)
+
