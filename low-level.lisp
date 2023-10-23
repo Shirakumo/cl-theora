@@ -157,7 +157,7 @@
   (channels :pointer)
   (samplerate :pointer))
 
-(cffi:defcfun ("tf_eos" eos) :int
+(cffi:defcfun ("tf_eos" eos) :boolean
   (file :pointer))
 
 (cffi:defcfun ("tf_reset" reset) :void
