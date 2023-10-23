@@ -5,7 +5,7 @@ This is a decoder library for the OGG/Theora video format via the theorafile C l
 Load the library and create a new file:
 
 :: common lisp
-(org.shirakumo.fraf.theora:open "video.ogg")
+(org.shirakumo.fraf.theora:open "video.ogv")
 ::
 
 From there you can read out the properties like the ``width``, ``height``, ``framerate``, ``pixel-format``, ``channels``, ``samplerate``, ``audio-track``, and ``video-track``.
@@ -15,3 +15,12 @@ With ``read-video`` and ``read-audio`` you can read out video and audio data res
 Note that reading video and audio is not thread safe, so you must put a lock around both if you intend on decoding from multiple threads.
 
 Once you are done with the file, you must ``free`` it.
+
+## Creating Theora Files
+To convert a video file to an ogg/theora file suitable for this library, we recommend using an ffmpeg command similar to this:
+
+::
+ffmpeg -i my-file -codec:v libtheora -qscale:v 7 -codec:a libvorbis -qscale:a 5 output.ogv
+::
+
+``qscale:v`` and ``qscale:a`` are the respective video and audio quality optimisation options, ranging from 0 to 10.
