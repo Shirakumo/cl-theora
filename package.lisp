@@ -5,6 +5,7 @@
    #:libtheorafile
    #:error
    #:pixel-format
+   #:seek
    #:callbacks
    #:callbacks-read-func
    #:callbacks-seek-func
@@ -110,5 +111,24 @@
 (defpackage #:org.shirakumo.fraf.theora
   (:use #:cl)
   (:local-nicknames
-   (#:theora #:org.shirakumo.fraf.theora.cffi))
-  (:export))
+   (#:theora #:org.shirakumo.fraf.theora.cffi)
+   (#:mem #:org.shirakumo.memory-regions))
+  (:export
+   #:theora-error
+   #:file
+   #:code
+   #:init
+   #:file
+   #:width
+   #:height
+   #:framerate
+   #:pixel-format
+   #:channels
+   #:samplerate
+   #:audio-track
+   #:video-track
+   #:free
+   #:reset
+   #:done-p
+   #:read-video
+   #:read-audio))

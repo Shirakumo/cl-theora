@@ -26,6 +26,11 @@
   :422
   :444)
 
+(cffi:defcenum seek
+  (:set 0)
+  (:current 1)
+  (:from-end 2))
+
 (cffi:defcstruct (callbacks :conc-name callbacks-)
   (read-func :pointer)
   (seek-func :pointer)
@@ -168,10 +173,10 @@
   (buffer :pointer)
   (samples :int))
 
-(cffi:defcfun ("tf_setaudiotrack" set-audio-track) :int
+(cffi:defcfun ("tf_setaudiotrack" set-audio-track) :boolean
   (file :pointer)
   (track :int))
 
-(cffi:defcfun ("tf_setvideotrack" set-video-track) :int
+(cffi:defcfun ("tf_setvideotrack" set-video-track) :boolean
   (file :pointer)
   (track :int))
