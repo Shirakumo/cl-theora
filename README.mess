@@ -1,0 +1,2 @@
+# About cl-theora
+This is a decoder library for the OGG/Theora video format via the theorafile C library. It offers easy and fast decoding for Theora video files, primarily intended for video playback in games.
