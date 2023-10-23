@@ -162,8 +162,8 @@
       (setf (theora:callbacks-read-func cb) (cffi:callback read-vector-stream))
       (setf (theora:callbacks-seek-func cb) (cffi:callback seek-vector-stream))
       (setf (theora:callbacks-close-func cb) (cffi:callback close-vector-stream))
-      (check-open source (theora:open-callbacks stream handle cb)
-        (cffi:foreign-free stream)))))
+      (check-open source (theora:open-callbacks index handle cb)
+        (cffi:foreign-free index)))))
 
 (defmethod (setf video-track) :before (track (file file))
   (unless (theora:set-video-track (handle file) track)
