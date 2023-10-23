@@ -161,6 +161,8 @@ DECLSPEC int tf_setaudiotrack(OggTheora_File *file, int vtrack);
  */
 DECLSPEC int tf_setvideotrack(OggTheora_File *file, int ttrack);
 
+DECLSPEC int tf_open_callbacks2(void *datasource, OggTheora_File *file, tf_callbacks *io);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

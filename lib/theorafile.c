@@ -687,3 +687,9 @@ int tf_readaudio(OggTheora_File *file, float *buffer, int samples)
 	}
 	return offset;
 }
+
+int tf_open_callbacks2(void *datasource, OggTheora_File *file, tf_callbacks *io){
+  tf_callbacks lio;
+  memcpy(&lio, io, sizeof(tf_callbacks));
+  return tf_open_callbacks(datasource, file, lio);
+}
