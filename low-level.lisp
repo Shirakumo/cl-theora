@@ -5,13 +5,14 @@
 (pushnew *static* cffi:*foreign-library-directories*)
 
 (cffi:define-foreign-library libtheorafile
-    (:darwin (:or #+X86 "libtheorafile-mac-i686.dylib"
-                  #+X86-64 "libtheorafile-mac-amd64.dylib"
-                  #+ARM64 "libtheorafile-mac-arm64.dylib"))
+  (:darwin (:or #+X86 "libtheorafile-mac-i686.dylib"
+                #+X86-64 "libtheorafile-mac-amd64.dylib"
+                #+ARM64 "libtheorafile-mac-arm64.dylib"))
   (:unix (:or #+X86 "libtheorafile-lin-i686.so"
               #+X86-64 "libtheorafile-lin-amd64.so"))
   (:windows (:or #+X86 "libtheorafile-win-i686.dll"
                  #+X86-64 "libtheorafile-win-amd64.dll"))
+  (:nx "libtheorafile.nro")
   (T (:or (:default "libtheorafile") (:default "theorafile"))))
 
 (cffi:defcenum error
