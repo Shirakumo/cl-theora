@@ -4,9 +4,9 @@
   :author "Yukari Hafner <shinmera@tymoon.eu>"
   :maintainer "Yukari Hafner <shinmera@tymoon.eu>"
   :description "A decoder library for the OGG/Theora video format via the theorafile C library"
-  :homepage "https://shirakumo.github.io/cl-theora/"
-  :bug-tracker "https://github.com/shirakumo/cl-theora/issues"
-  :source-control (:git "https://github.com/shirakumo/cl-theora.git")
+  :homepage "https://shirakumo.org/docs/cl-theora/"
+  :bug-tracker "https://shirakumo.org/project/cl-theora/issues"
+  :source-control (:git "https://shirakumo.org/project/cl-theora.git")
   :serial T
   :components ((:file "package")
                (:file "low-level")
